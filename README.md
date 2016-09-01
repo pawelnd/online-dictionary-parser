@@ -1,1 +1,1 @@
-Parser for "wiki dictionary" and store data in own database
+Application parse "wiki dictionary" and store data in own database
