@@ -1,1 +1,1 @@
-# online-dictionary-parser
+Parser for "wiki dictionary" and store data in own database
