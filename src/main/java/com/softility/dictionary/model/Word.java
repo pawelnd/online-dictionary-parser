@@ -8,6 +8,7 @@ import java.sql.Date;
 
 @Data
 @Entity
+@Table(name = "words")
 public class Word implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,6 +19,9 @@ public class Word implements Serializable {
 
     @Enumerated(EnumType.STRING)
     private PartOfSpeech partOfSpeech;
+
+    @Column
+    private Boolean plural;
 
     @Column
     private Date lastUpdate;

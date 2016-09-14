@@ -9,16 +9,23 @@
 	<import resource="../config/context.xml" />
 
 	<bean id="itemProcessor" class="com.softility.dictionary.page.PageItemProcessor" />
-	<bean id="reader" class="com.softility.dictionary.page.PageItemsReader" />
-	<bean id="writer" class="com.softility.dictionary.page.PageItemsWriter" />
+	<bean id="pageContentFetcher" class="com.softility.dictionary.page.ItemsListPageContentProducer" ></bean>
+	<bean id="writer" class="com.softility.dictionary.page.PageItemsWriter" ></bean>
 
-	<batch:job id="helloWorldJob">
-		<batch:step id="step1">
-			<batch:tasklet>
-				<batch:chunk reader="reader" writer="writer" processor="itemProcessor"
-							 commit-interval="10">
-				</batch:chunk>
-			</batch:tasklet>
+	<batch:job id="dictionaryReader">
+		<batch:step id="step1" next="step2">
+			<tasklet>
+				<chunk reader="pageContentFetcher" writer="writer" commit-interval="1" />
+			</tasklet>
+		</batch:step>
+		<batch:step id="step2">
+			<tasklet>
+				<chunk reader="pageContentFetcher" writer="writer"
+					   processor="itemProcessor" commit-interval="1" />
+			</tasklet>
 		</batch:step>
 	</batch:job>
+
+
+
 </beans>

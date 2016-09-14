@@ -34,7 +34,6 @@ public class ParserApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-
         try {
             JobParameters jobParameters =
                     new JobParametersBuilder()
