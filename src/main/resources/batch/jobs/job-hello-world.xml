@@ -8,22 +8,44 @@
 
 	<import resource="../config/context.xml" />
 
-	<bean id="itemProcessor" class="com.softility.dictionary.page.PageItemProcessor" />
-	<bean id="pageContentFetcher" class="com.softility.dictionary.page.ItemsListPageContentProducer" ></bean>
-	<bean id="writer" class="com.softility.dictionary.page.PageItemsWriter" ></bean>
+	<!--Getting page data-->
+
+	<bean id="pageDataReader" class="com.softility.dictionary.page.PageReader" />
+	<bean id="pageDataWriter" class="com.softility.dictionary.page.PageWriter" />
+	<bean id="passThroughProcessor" class="org.springframework.batch.item.support.PassThroughItemProcessor" />
+
+	<bean id="wordDataReader" class="com.softility.dictionary.page.word.WordReader" />
+	<bean id="WordDataWriter" class="com.softility.dictionary.page.word.WordWriter" />
+	<bean id="wordProcessor" class="com.softility.dictionary.page.word.WordProcessor" />
+	<bean id="limitDecider" class="com.softility.dictionary.page.LimitDecider">
+		<property name="limit" value="9" />
+	</bean>
+
 
 	<batch:job id="dictionaryReader">
 		<batch:step id="step1" next="step2">
 			<tasklet>
-				<chunk reader="pageContentFetcher" writer="writer" commit-interval="1" />
+				<chunk reader="pageDataReader"
+					   processor="passThroughProcessor"
+					   writer="pageDataWriter"
+					   commit-interval="1" />
 			</tasklet>
 		</batch:step>
-		<batch:step id="step2">
+		<batch:step id="step2" next="limitDecision">
 			<tasklet>
-				<chunk reader="pageContentFetcher" writer="writer"
-					   processor="itemProcessor" commit-interval="1" />
+				<chunk reader="wordDataReader"
+					   processor="wordProcessor"
+					   writer="WordDataWriter"
+					   commit-interval="1"/>
 			</tasklet>
+			<batch:listeners>
+				<batch:listener ref="wordDataReader"/>
+			</batch:listeners>
 		</batch:step>
+		<batch:decision id="limitDecision" decider="limitDecider">
+			<batch:next on="CONTINUE" to="step1" />
+			<batch:end on="COMPLETED" />
+		</batch:decision>
 	</batch:job>
 
 

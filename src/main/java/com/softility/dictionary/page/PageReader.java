@@ -1,36 +1,49 @@
 package com.softility.dictionary.page;
 
 import com.softility.dictionary.model.WordRepository;
-import com.softility.dictionary.utils.PageContentGrabber;
+import org.apache.log4j.Logger;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
-public class ItemsListPageContentProducer implements ItemReader {
+import java.net.MalformedURLException;
+import java.net.URL;
+
+/**
+*  Part of Spring batch flow.
+ *  It is responsible for fetching new word list for
+* */
+public class PageReader implements ItemReader {
+    private final Logger logger  = Logger.getLogger(PageReader.class);
     @Autowired
     Environment environment;
     @Autowired
     private WordRepository wordRepository;
-    private
-    int limiter = 0;
+    @Autowired
+    PageParser pageParser;
+
+    private int limiter = 0;
     private String initializationWord = "config.starting.word";
     private String itemsListPageAddress = "config.dictionary.page.address";
 
-    @Autowired
-    PageContentGrabber pageContentGrabber;
-
     @Override
-    public String read() throws Exception {
-        if(limiter++ > 0){
+    public Page read() throws Exception {
+        if(limiter++ == 0){
             String lastReceivedWord = getLassReceivedWord();
-            return pageContentGrabber.getContent(buildPageURL(lastReceivedWord));
+            URL pageUrl = buildPageURL(lastReceivedWord);
+            return pageParser.parsePage(pageUrl);
         }
         return null;
     }
 
-    private String buildPageURL(String lastReceivedWord) {
+    private URL buildPageURL(String lastReceivedWord) {
         String pageAddress = environment.getProperty(itemsListPageAddress);
-        return pageAddress.replace("%FROM_WORD%",lastReceivedWord);
+        pageAddress = pageAddress.replace("%FROM_WORD%",lastReceivedWord);
+        try {
+            return new URL(pageAddress);
+        } catch (MalformedURLException e) {
+            return null;
+        }
     }
 
     private String getLassReceivedWord() {
