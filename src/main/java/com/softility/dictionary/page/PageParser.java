@@ -1,6 +1,6 @@
 package com.softility.dictionary.page;
 
-import com.softility.dictionary.utils.HrefToUrlConverter;
+import com.softility.dictionary.utils.HrefToURL;
 import com.softility.dictionary.utils.PageContentGrabber;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
@@ -34,7 +34,7 @@ public class PageParser {
                 .map(x -> {
                     String href = x.attr("href");
                     String word = x.text();
-                    return new WordData(word,HrefToUrlConverter.getFullPath(href,pageURL));
+                    return new WordData(word, HrefToURL.getFullPath(href,pageURL));
                 })
                 .filter(x -> x != null)
                 .collect(Collectors.toList());
@@ -43,6 +43,6 @@ public class PageParser {
     private URL getNextPageURL(String content, URL pageURL){
         Elements elements = Jsoup.parse(content).body().select("#mw-pages a");
         Element last = elements.last();
-        return HrefToUrlConverter.getFullPath(last.attr("href"),pageURL);
+        return HrefToURL.getFullPath(last.attr("href"),pageURL);
     }
 }

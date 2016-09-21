@@ -22,7 +22,7 @@
 	</bean>
 
 
-	<batch:job id="dictionaryReader">
+	<batch:job id="dictionaryReader" restartable="true">
 		<batch:step id="step1" next="step2">
 			<tasklet>
 				<chunk reader="pageDataReader"

@@ -15,7 +15,7 @@ public class WordWriter implements ItemWriter<WordData> {
 
     @Override
     public void write(List<? extends WordData>  contentList) throws Exception {
-
+        System.out.println(contentList);
     }
 
 }
